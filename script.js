@@ -13,166 +13,137 @@
             - use your browsers console throughout testing.
 */
 
-
 export const gameDetails = {   
     title: 'Game Title',
     desc: 'Welcome to the world of... here are some quick rules & concepts...',
-    author: 'SS',
-    cohort: 'PTSB-2023',
-    startingRoomDescription: 'What you see before you is...',
+    author: 'Student Name',
+    cohort: 'SBPT-2022',
+    startingRoomDescription: 'What you see before you is a shiny shimmering Lake',
     playerCommands: [
         // replace these with your games commands as needed
-        'inspect', 'view', 'add to bag', 'pickup',
+        'inspect', 'view', 'add', 'pickup',
     ]
     // Commands are basic things that a player can do throughout the game besides possibly moving to another room. This line will populate on the footer of your game for players to reference. 
     // This shouldn't be more than 6-8 different commands.
 }
 
+ // Rooms constructor and 4 rooms
+class room {
+    constructor (name, description, item, locked, exits) {
+    this.name = name
+    this.description = description
+    this.item = []
+    this.locked = false
+    this.exits =[]
+    console.log(`You have arrived at ${this.name} use the commands and items to figure out where to go next!`)
+    }
+     }
+     const lake = new room (
+        "Lake", 
+"A shiny and shimmering body of water",
+ ["key", "stone","kite"],
+  false,
+   ["Library", "Chamber","Garden"]
+   );
+
+
+    // console.log("Items", lake.item) 
+
+   const garden = new room ( 
+    "Garden", 
+   "A lush and inviting garden",
+   ["harp", "gnome", "fairy"],
+   false,
+   ["Library", "Chamber", "Lake"]
+);
+
+// console.log(garden.description) test II |Y|
+
+const chamber = new room (
+    "Chamber",
+    "A dark and mysterious lair"
+    ["cross", "artifact", "tomb"],
+    false,
+    ["Lake", "Garden", "Library"]
+);
+
+// console.log(chamber.item) test III |N|  console did not show list within the array
+
+const library = new room (
+    "Library",
+    "an inviting and brightly lit library",
+    ["book", "manuscript", "globe"],
+    false,
+    ["Lake", "Garden", "Chamber"]
+
+    
+
+    
+);
+
+// console.log(library.name)
+// console.log(library.item) Test IV |Y| passed however no array items shown.
 
 // Your code here
 
-let gameDetails = {};
+//Item constructor
+// --------------------------------------------------------------------------//
 
-const dictionary = {
-    locations: ["Metallic Lake", "Eden's Garden", "Alchemists Library", "Chamber of Hearts"],
-    exitLocation: [
-         { location: "Metallic Lake", exitName: "Icarian Dreams," },
-         { location: "Eden's Garden", exitName: "Jacob's Ladder"},
-         { location: "Alchemists Library", exitName: "Edward's Lab"},
-         { location: "Chamber of Hearts", exitName: "Hollow Bastion"}
-    ],
-
-    items: [ "Key", "Map", "Harp", "Obsidian" ],
-    itemLocation: [ 
-        { item: "Key", itemLocation: "Metallic Lake",},
-        {item: "Map", itemLocation: "Chamber of Hearts"},
-        {item: "Harp", itemLocation: "Eden's Garden"},
-        {item: "Obsidian", itemLocation: "Alchemists Library"} 
-    ],
-         
-itemInteractions: [
-    {item: "Map", itemInteractions: "view"},
-    {item: "Key", itemInteractions: "pickup"},
-    {item: "Harp", itemInteractions: "inspect"},
-    {item: "Obsidian", itemInteractions: "add to bag"}
-
-]
-    
-
+class item {
+constructor (name, description, location, visible, interaction) {
+this.name = name
+this.descritpion = description
+this.location = location
+this.visible = true
+this.interaction = interaction
+console.log (`You have interacted with ${this.name} what would you like to do? Type your command`)
 }
-
-
-gamdeDetails.items = [];
-
-gameDetails.locations = {};
-
-function createItem(name, description,location)
-let item = {
-    name: name,
-    description: description,
-    location: location,
-    interact: function() {
-        console.log(`You interacted with ${this.name}.`);
-    }
-};
-
-
-         let key = createItem ("Key", "A shiny golden key is before you", "Metallic Lake") 
-        
-
-
-    //    let key = {name: "Key",
-    //     description: "A shiny golden key is before you",
-    //     location: "Metallic Lake",
-    //    interact: function() {
-    //     console.log( `You interacted with ${this.name}.`);
-    //    }
-    //    };
-
-    //   key.interact() 
-        
-        let Map = createItem("Map", "An old map with ancient and mysterious markings", "Chamber of Hearts") 
-
-        let Harp = createItem("Harp", "The sound of a beautiful harp has drawn in you in to the garden", "Eden's Garden")
-         let Obsidan = createItem("Obsidian", "Stone to stone and dust dust in the black obsidian the alchemist trusts", "Alchemists Library")
-     
-    
-  
-
-gameDetails.items.push(item);
-
-function createLocation(name, exits, description) {
-    gameDetails.locations[name] = {
-        exits: exits,
-        description: description,
-        items: [],
-
-        
-    }
-
-    let metallicLake = createLocation("Metallic Lake", "Icarian Dreams", "Your flight and freedom is what is at stake. Take the leap or face your fate. You have arrived at the Metallic Lake" )
-
-    {gameDetails.locations[metallicLake] = 
-        {exits: "Icarian Dreams", 
-          description: "Your flight and freedom is what is at stake. Take the leap or face your fate. You have arrived at the Metallic Lake",
-        items: "Key",
-        }
-    }
-
-   let chamberOfHearts = createLocation("Chamber of Hearts", "Hollow Bastion", "To unlock this chamber x marks the spot. X is what you feel not something you thought You have now entered the Chamber of Hearts")
-   {gameDetails.locations[chamberOfHearts] = 
-    {exits: "Hollow Bastion", 
-      description: "To unlock this chamber x marks the spot. X is what you feel not something you thought You have now entered the Chamber of Hearts",
-    items: "Map"
-    }
-
-   }
-    let aclhemistsLibrary = createLocation("Alchemists Library", "Edward's Lab", "Goodbye and bye when two becomes one you may one day find out why? Welcome to the Alchemist's Library")
-    {gameDetails.locations[aclhemistsLibrary] = 
-        {exits: "Edward's Lab", 
-          description: "Goodbye and bye when two becomes one you may one day find out why? Welcome to the Alchemist's Library",
-        items: "Obsidian"
-        }
-
-    let edensGarden = createLocation("Eden's Garden", "Jacob's Ladder", "Who was first deceived the one who ate the apple or the one who believed. Your journey begins at Eden's Garden")
-    {gameDetails.locations[edensGarden] = 
-        {exits: "Jacob's Ladder", 
-          description: "Who was first deceived the one who ate the apple or the one who believed. Your journey begins at Eden's Garden",
-        items: "Harp"
-        }
-
-    
-    }
-    function assignItemToLocation (itemName, locationName) {
-        if (gameDetails.locations[locationName]) {
-            gameDetails.locations[locationName].items.push(itemName);
-        }
-      let keyLocation =  assignItemToLocation("Key", "Metallic Lake")
-      {if (gameDetails.locations ["Metallic Lake"])
-    {gameDetails.locations["Metallic Lake"].items.push(keyItem)
-
-
-
-    }
-
-    console.log(keyLocation)
 }
-    let mapLocation = assignItemToLocation("Map", "Chamber of Hearts")
-   let harpLocation = assignItemToLocation("Harp", "Eden's Garden")
-    let obsidianLocation = assignItemToLocation("Obsidian", "Alchemists Library") 
-    
-    }
-    
-    
-}
+const key = new item (
+    "Key",
+    "A shiny a golden key",
+    "Lake",
+    true,
+    "pickup"
+);
 
+const map = new item (
+    "Map",
+    "an old and archaic map",
+    "Chamber",
+    true,
+    "view",
+);
+
+const obsidian = new item (
+    "Obsidian",
+    "A dark and ominous stone",
+    "Library",
+    true,
+    "add"
+); 
+
+const harp = new item (
+
+"Harp",
+"A beatiful and illustrious musical instrument",
+"Garden",
+true,
+"Inspect"
+)
 
 export const domDisplay = (playerInput) => {
+
+   
+    console.log(playerInput)
+return  playerInput
+
+function itemInteractions
     /* 
         TODO: for students
         - This function must return a string. 
         - This will be the information that is displayed within the browsers game interface above the users input field.
- 
+
         - This function name cannot be altered. 
         - "playerInput" is whatever text the user is typing within the input field in the browser after hitting the ENTER key.
             - test this out with a console log.
