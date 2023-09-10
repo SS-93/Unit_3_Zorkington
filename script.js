@@ -154,6 +154,18 @@ export const domDisplay = (playerInput) => {
                 } else {
                     return `The ${argument} room cannot be accessed from here.`;
                 }
+
+                case 'drop':
+    if (playerInventory.includes(argument)) { 
+        const itemIndexInInventory = playerInventory.indexOf(argument);
+        playerInventory.splice(itemIndexInInventory, 1);
+        
+        currentPlayerRoom.items.push(argument); 
+        
+        return `You dropped the ${argument} in the ${currentPlayerRoom.name}.`;
+    } else {
+        return `You don't have a ${argument} to drop.`;
+    }
     
         default:
             return `I don't know how to ${command}`;
