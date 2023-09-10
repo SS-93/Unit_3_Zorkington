@@ -18,7 +18,7 @@ export const gameDetails = {
     startingRoomDescription: 'What you see before you is... A shiny and shimmering body of water type enter to begin',
     playerCommands: [
         // replace these with your games commands as needed
-        'inspect', 'view', 'add', 'pickup','drop', 'enter'
+        'inspect', 'view', 'add', 'pickup','drop', 'enter', 'move', 'drop'
     ]
     // Commands are basic things that a player can do throughout the game besides possibly moving to another room. This line will populate on the footer of your game for players to reference. 
     // This shouldn't be more than 6-8 different commands.
@@ -100,7 +100,6 @@ export const domDisplay = (playerInput) => {
     const argument = args.join(' ');
 
     switch (command) {
-        case 'enter':
             case 'enter':
                 if (playerInventory.includes("key")) {
                     currentPlayerRoom = garden; 
@@ -131,7 +130,31 @@ export const domDisplay = (playerInput) => {
                 } else {
                 return `There is no ${argument} here to pick up.`;
             }
-        // ... handle other commands ...
+            case 'move':
+
+            const desiredRoom = allRooms.find(room => room.name === argument);
+
+    if (!desiredRoom) {
+        return `The ${argument} room does not exist.`;
+    }
+                if (currentPlayerRoom.exits.includes(argument)) {
+    
+                    currentPlayerRoom = allRooms.find(room => room.name === argument);
+                
+                    if (!currentPlayerRoom.exits.includes(argument)) {
+                        return `The ${argument} room cannot be accessed from here.`;
+                    }
+
+                    currentPlayerRoom = desiredRoom;
+        
+                    const roomDetails = `
+                        You have arrived at the ${currentPlayerRoom.name} : ${currentPlayerRoom.getDescription()}
+                        Items: ${currentPlayerRoom.getItemList()}`;
+                    return roomDetails;
+                } else {
+                    return `The ${argument} room cannot be accessed from here.`;
+                }
+    
         default:
             return `I don't know how to ${command}`;
     }
