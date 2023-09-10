@@ -15,7 +15,7 @@ export const gameDetails = {
     desc: 'Welcome to the world of... here are some quick rules & concepts...',
     author: 'Student Name',
     cohort: 'SBPT-2022',
-    startingRoomDescription: 'What you see before you is...',
+    startingRoomDescription: 'What you see before you is... A shiny and shimmering body of water type enter to begin',
     playerCommands: [
         // replace these with your games commands as needed
         'inspect', 'view', 'add', 'pickup','drop', 'enter'
@@ -44,9 +44,13 @@ class Room {
     getExitList() {
         return this.exits.join(', ');
     }
+    hasItem(itemName) {
+        return this.item.includes(itemName);
+    }
 }
 
-const lake = new Room( "Lake","A shiny and shimmering body of water you see a lush green field to the east", ["key", "stone", "kite"],false,["Library", "Chamber", "Garden"]);
+
+const lake = new Room( "Lake","A shiny and shimmering body of water you see a lush green field to the east. Now you will see a list of items, one of these items will unlock the next location, type in the correct command and item to unlock the next location", ["key", "stone", "kite"],false,["Garden"]);
 
 const garden = new Room("Garden","A lush and inviting garden you see dark and mysterious opening to the north",["harp", "gnome", "fairy"],false,["Library", "Chamber", "Lake"]);
 
@@ -73,6 +77,10 @@ class GameItems {
     interact() {
         console.log(`You interacted with the ${this.name}.`);
     }
+    hasItem(itemName) {
+        return this.item.includes(itemName);
+    }
+
 }
 
 const key = new GameItems( "Key", "A shiny golden key", "Lake")
@@ -82,11 +90,59 @@ const harp = new GameItems( "Key", "A beautiful harp", "Garden")
 
 // Your code here
 
+let currentPlayerRoom = lake;
+let playerInventory = [];
+
+
+
 export const domDisplay = (playerInput) => {
-    console.log(playerInput)
-    return  playerInput
+    const [command, ...args] = playerInput.split(' ');
+    const argument = args.join(' ');
+
+    switch (command) {
+        case 'enter':
+            case 'enter':
+                if (playerInventory.includes("key")) {
+                    currentPlayerRoom = garden; 
+                }
+            const roomDetails = `
+               You have arrived at the ${currentPlayerRoom.name} : ${currentPlayerRoom.getDescription()}
+                Items: ${currentPlayerRoom.getItemList()}`
+                ;
+            return roomDetails;
+        case 'view':
+            return `Items: ${currentPlayerRoom.getItemList()} \nExits: ${currentPlayerRoom.getExitList()}`;
+            case 'pickup':
+                if (currentPlayerRoom.hasItem(argument)) {
+                    playerInventory.push(argument)
+
+                    const itemIndex = currentPlayerRoom.item.indexOf(argument);
+            currentPlayerRoom.item.splice(itemIndex, 1);
+
+                   
+                    if (argument === "key") {
+                        
+                        if (!currentPlayerRoom.exits.includes("Garden")) {
+                            currentPlayerRoom.exits.push("Garden");
+                        }
+                        return `You picked up the ${argument}. Now you can see an exit leading to the Garden.`;
+                    }
+                    return `You picked up the ${argument}`;
+                } else {
+                return `There is no ${argument} here to pick up.`;
+            }
+        // ... handle other commands ...
+        default:
+            return `I don't know how to ${command}`;
+    }
+
 
 }
+
+// next steps set the statement 1) the exits 2 state that you see 3 items before one of these items and commands will unlock the next location type the command and item. when the correct item and command is selected you will move on to the next room 
+
+
+
     /* 
         TODO: for students
         - This function must return a string. 
@@ -116,5 +172,8 @@ export const domDisplay = (playerInput) => {
     */
 
     // Your code here
+
+
+
 
     
