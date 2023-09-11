@@ -15,10 +15,10 @@ export const gameDetails = {
     desc: 'Welcome to the world of... here are some quick rules & concepts...',
     author: 'Student Name',
     cohort: 'SBPT-2022',
-    startingRoomDescription: 'What you see before you is... A shiny and shimmering body of water type enter to begin',
+    startingRoomDescription: 'What you see before you is... A shiny and shimmering body of water type start to begin',
     playerCommands: [
         // replace these with your games commands as needed
-        'inspect', 'view', 'add', 'pickup','drop', 'enter', 'move', 'drop'
+        'inspect', 'view', 'add', 'pickup','drop', 'enter', 'move', 'drop', 'start'
     ]
     // Commands are basic things that a player can do throughout the game besides possibly moving to another room. This line will populate on the footer of your game for players to reference. 
     // This shouldn't be more than 6-8 different commands.
@@ -52,11 +52,11 @@ class Room {
 
 const lake = new Room( "Lake","A shiny and shimmering body of water you see a lush green field to the east. Now you will see a list of items, one of these items will unlock the next location, type in the correct command and item to unlock the next location", ["key", "stone", "kite"],false,["Garden"]);
 
-const garden = new Room("Garden","A lush and inviting garden you see dark and mysterious opening to the north",["harp", "gnome", "fairy"],false,["Library", "Chamber", "Lake"]);
+const garden = new Room("Garden","A lush and inviting garden you see dark and mysterious opening to the north",["harp", "gnome", "fairy"],false,["Chamber"]);
 
 const chamber = new Room("Chamber","A dark and mysterious lair you see a brightly lit and archaic building to the North",["cross", "artifact", "tomb"],false,["Lake", "Garden", "Library"]);
 
-const library = new Room( "Library","an inviting and brightly lit library",["book", "manuscript", "globe"],false,["Lake", "Garden", "Chamber"]);
+const library = new Room( "Library","an inviting and brightly lit library you have found the knowledge the game is now complete this project was sooooo difficult at",["book", "manuscript", "globe"],false,["Lake", "Garden", "Chamber"]);
 
 const allRooms = [lake, garden, chamber, library];
 allRooms.forEach(room => {
@@ -87,11 +87,13 @@ const key = new GameItems( "Key", "A shiny golden key", "Lake")
 const map = new GameItems( "Key", "An old an archaic map", "chamber")
 const obsidian = new GameItems( "Key", "A dark and ominous stone", "Library")
 const harp = new GameItems( "Key", "A beautiful harp", "Garden")
-
+ 
 // Your code here
 
 let currentPlayerRoom = lake;
 let playerInventory = [];
+let canEnterChamber = false
+let canEnterLibrary = false;
 
 
 
@@ -100,72 +102,80 @@ export const domDisplay = (playerInput) => {
     const argument = args.join(' ');
 
     switch (command) {
-            case 'enter':
-                if (playerInventory.includes("key")) {
-                    currentPlayerRoom = garden; 
-                }
-            const roomDetails = `
-               You have arrived at the ${currentPlayerRoom.name} : ${currentPlayerRoom.getDescription()}
-                Items: ${currentPlayerRoom.getItemList()}`
-                ;
-            return roomDetails;
+        case 'start':
+            currentPlayerRoom = lake;
+            return `You have started the game!\nYou are now at the ${currentPlayerRoom.name}: ${currentPlayerRoom.getDescription()}\nItems: ${currentPlayerRoom.getItemList()}`;
+        
+        case 'enter':
+            if (currentPlayerRoom.name === "Lake" && playerInventory.includes("key")) {
+                currentPlayerRoom = garden;
+            } else if (currentPlayerRoom.name === "Garden" && playerInventory.includes("harp")) {
+                currentPlayerRoom = allRooms.find(room => room.name === "Chamber");
+            } else if (currentPlayerRoom.name === "Chamber" && canEnterLibrary) {
+                currentPlayerRoom = allRooms.find(room => room.name === "Library");
+            } else {
+                return `You can't enter anywhere specific from here.`;
+            }
+    
+            return `You have arrived at the ${currentPlayerRoom.name}: ${currentPlayerRoom.getDescription()}\nItems: ${currentPlayerRoom.getItemList()}`;
+        
         case 'view':
-            return `Items: ${currentPlayerRoom.getItemList()} \nExits: ${currentPlayerRoom.getExitList()}`;
-            case 'pickup':
-                if (currentPlayerRoom.hasItem(argument)) {
-                    playerInventory.push(argument)
+            if (currentPlayerRoom.name === 'Chamber' && argument === 'tomb') {
+            canEnterLibrary = true;
+            return `You inspected the tomb. You sense an entrance to the Library. Maybe you can enter it now.`;
+            } else {
+            return `Items: ${currentPlayerRoom.getItemList()}\nExits: ${currentPlayerRoom.getExitList()}`;
+            }
 
-                    const itemIndex = currentPlayerRoom.item.indexOf(argument);
-            currentPlayerRoom.item.splice(itemIndex, 1);
-
-                   
-                    if (argument === "key") {
-                        
-                        if (!currentPlayerRoom.exits.includes("Garden")) {
-                            currentPlayerRoom.exits.push("Garden");
-                        }
-                        return `You picked up the ${argument}. Now you can see an exit leading to the Garden.`;
-                    }
-                    return `You picked up the ${argument}`;
-                } else {
+        
+        case 'pickup':
+            if (currentPlayerRoom.hasItem(argument)) {
+                playerInventory.push(argument);
+                const itemIndex = currentPlayerRoom.item.indexOf(argument);
+                currentPlayerRoom.item.splice(itemIndex, 1);
+    
+                if (argument === "key" && !currentPlayerRoom.exits.includes("Garden")) {
+                    currentPlayerRoom.exits.push("Garden");
+                    return `You picked up the ${argument}. Now you can see an exit leading to the Garden.`;
+                }
+                return `You picked up the ${argument}`;
+            } else {
                 return `There is no ${argument} here to pick up.`;
             }
-            case 'move':
-
-            const desiredRoom = allRooms.find(room => room.name === argument);
-
-    if (!desiredRoom) {
-        return `The ${argument} room does not exist.`;
-    }
-                if (currentPlayerRoom.exits.includes(argument)) {
     
-                    currentPlayerRoom = allRooms.find(room => room.name === argument);
-                
-                    if (!currentPlayerRoom.exits.includes(argument)) {
-                        return `The ${argument} room cannot be accessed from here.`;
-                    }
-
-                    currentPlayerRoom = desiredRoom;
-        
-                    const roomDetails = `
-                        You have arrived at the ${currentPlayerRoom.name} : ${currentPlayerRoom.getDescription()}
-                        Items: ${currentPlayerRoom.getItemList()}`;
-                    return roomDetails;
-                } else {
-                    return `The ${argument} room cannot be accessed from here.`;
+        case 'move':
+            const desiredRoom = allRooms.find(room => room.name === argument);
+            if (!desiredRoom) {
+                return `The ${argument} room does not exist.`;
+            }
+    
+            if (currentPlayerRoom.exits.includes(argument)) {
+                currentPlayerRoom = desiredRoom;
+                return `You have arrived at the ${currentPlayerRoom.name}: ${currentPlayerRoom.getDescription()}\nItems: ${currentPlayerRoom.getItemList()}`;
+            } else {
+                return `The ${argument} room cannot be accessed from here.`;
+            }
+    
+        case 'drop':
+            if (playerInventory.includes(argument)) {
+                const itemIndexInInventory = playerInventory.indexOf(argument);
+                playerInventory.splice(itemIndexInInventory, 1);
+                currentPlayerRoom.items.push(argument);
+                return `You dropped the ${argument} in the ${currentPlayerRoom.name}.`;
+            } else {
+                return `You don't have a ${argument} to drop.`;
+            }
+    
+        case 'inspect':
+            if (currentPlayerRoom.name === "Garden" && argument === "harp") {
+                if (!playerInventory.includes("harp")) {
+                    playerInventory.push("harp");
                 }
-
-                case 'drop':
-    if (playerInventory.includes(argument)) { 
-        const itemIndexInInventory = playerInventory.indexOf(argument);
-        playerInventory.splice(itemIndexInInventory, 1);
-        
-        currentPlayerRoom.items.push(argument); 
-        
-        return `You dropped the ${argument} in the ${currentPlayerRoom.name}.`;
-    } else {
-        return `You don't have a ${argument} to drop.`;
-    }
+                canEnterChamber = true;
+                return `You inspected the harp and took it with you. You feel a connection to the Chamber. Maybe you can enter it now.`;
+            } else {
+                return `You can't inspect that here.`;
+            }
     
         default:
             return `I don't know how to ${command}`;
@@ -173,6 +183,8 @@ export const domDisplay = (playerInput) => {
 
 
 }
+
+// next steps sequence the game so that when you enter garden and inspect the harp you now see the exit to the chamber and from the chamber when you view the tomb you can now enter the library at that point the game will not be complete 
 
 // next steps set the statement 1) the exits 2 state that you see 3 items before one of these items and commands will unlock the next location type the command and item. when the correct item and command is selected you will move on to the next room 
 
